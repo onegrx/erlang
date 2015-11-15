@@ -10,11 +10,14 @@
 -author("onegrx").
 
 %% API
--export([len/1]).
+-export([len/1, sum/1]).
 
 
 len([]) -> 0;
 len([_|T]) -> 1 + len(T).
+
+sum([]) -> 0;
+sum([H|T]) -> H + sum(T).
 
 
 
