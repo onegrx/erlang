@@ -6,7 +6,7 @@
 %%% @end
 %%% Created : 15. Nov 2015 21:23
 %%%-------------------------------------------------------------------
--module(list_lenght).
+-module(list_operations).
 -author("onegrx").
 
 %% API
@@ -15,4 +15,7 @@
 
 len([]) -> 0;
 len([_|T]) -> 1 + len(T).
+
+
+
 
