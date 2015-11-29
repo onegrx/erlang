@@ -18,7 +18,8 @@ onp(Expression) ->
   eval(List, []).
 
 eval([], []) -> io:format("Empty list ~n");
-eval([], [H|_]) -> H;
+%eval([], [H|_]) -> H;
+eval([], Result) -> Result;
 
 eval(["+"|T], [A,B|Rest]) -> eval(T, [B+A|Rest]);
 eval(["-"|T], [A,B|Rest]) -> eval(T, [B-A|Rest]);
