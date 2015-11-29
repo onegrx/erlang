@@ -25,5 +25,9 @@ eval(["+"|T], [A,B|Rest]) -> eval(T, [B+A|Rest]);
 eval(["-"|T], [A,B|Rest]) -> eval(T, [B-A|Rest]);
 eval(["*"|T], [A,B|Rest]) -> eval(T, [B*A|Rest]);
 eval(["/"|T], [A,B|Rest]) -> eval(T, [B/A|Rest]);
+eval(["sqrt"|T], [A|Rest]) -> eval(T, [math:sqrt(A)|Rest]);
 
-eval([H|T], Stack) -> eval(T, [list_to_integer(H)|Stack]).
+
+
+%eval([H|T], Stack) -> eval(T, [list_to_integer(H)|Stack]).
+eval([H|T], Stack) -> eval(T, [list_to_float(H)|Stack]).
