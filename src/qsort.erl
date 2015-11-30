@@ -10,7 +10,7 @@
 -author("onegrx").
 
 %% API
--export([qs/1, randomElems/3, quicksortVsSort/0]).
+-export([qs/1, randomElems/3, quicksortVsSort/0, map/2, filter/2]).
 
 lessThan(List, Arg) -> [X || X <- List, X < Arg].
 grtEqThan(List, Arg) -> [X || X <- List, X >= Arg].
@@ -32,3 +32,8 @@ compareSpeeds(List, Fun1, Fun2) ->
 quicksortVsSort() ->
   compareSpeeds(randomElems(10000, 1, 100000), qs, sort).
 
+map(Fun, List) ->
+  [Fun(X) || X <- List].
+
+filter(Fun, List) ->
+  [X || X <- List, Fun(X)].
