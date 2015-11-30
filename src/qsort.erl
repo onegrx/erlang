@@ -10,7 +10,7 @@
 -author("onegrx").
 
 %% API
--export([qs/1, randomElems/3, quicksortVsSort/0, map/2, filter/2, sumDigits/1]).
+-export([qs/1, randomElems/3, quicksortVsSort/0, map/2, filter/2, sumDigits/1, anonymousFactorial/1]).
 
 lessThan(List, Arg) -> [X || X <- List, X < Arg].
 grtEqThan(List, Arg) -> [X || X <- List, X >= Arg].
@@ -41,3 +41,7 @@ filter(Fun, List) ->
 sumDigits(N) ->
   List = [X - 48 || X <-integer_to_list(N)],
   lists:foldl(fun(X, Y) -> X + Y end, 0, List).
+
+anonymousFactorial(N) ->
+  Fact = fun(0, Self) -> 1; (N, Self) -> N * Self(N - 1, Self) end,
+  Fact(N, Fact).
