@@ -10,7 +10,7 @@
 -author("onegrx").
 
 %% API
--export([qs/1, randomElems/3, quicksortVsSort/0, map/2, filter/2]).
+-export([qs/1, randomElems/3, quicksortVsSort/0, map/2, filter/2, sumDigits/1]).
 
 lessThan(List, Arg) -> [X || X <- List, X < Arg].
 grtEqThan(List, Arg) -> [X || X <- List, X >= Arg].
@@ -30,10 +30,14 @@ compareSpeeds(List, Fun1, Fun2) ->
     [Fun2, ?MODULE, Fun1, integer_to_list(TimeDiff)]).
 
 quicksortVsSort() ->
-  compareSpeeds(randomElems(10000, 1, 100000), qs, sort).
+  compareSpeeds(randomElems(1000000, 1, 1000000), qs, sort).
 
 map(Fun, List) ->
   [Fun(X) || X <- List].
 
 filter(Fun, List) ->
   [X || X <- List, Fun(X)].
+
+sumDigits(N) ->
+  List = [X - 48 || X <-integer_to_list(N)],
+  lists:foldl(fun(X, Y) -> X + Y end, 0, List).
