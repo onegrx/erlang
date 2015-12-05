@@ -12,16 +12,16 @@
 %% API
 -export([createAdressBook/0, addContact/3]).
 
--record(entry, {name, surname, phone, email}).
+-record(entry, {person, phone, email}).
 
 createAdressBook() -> [].
 
 addContact(Name, Surname, AdressBook) ->
   case isAlready(Name, Surname, AdressBook) of
-    false -> [#entry{name = Name, surname = Surname}|AdressBook];
+    false -> [#entry{person = {Name, Surname}}|AdressBook];
     _ -> {error, "This entry already exists"}
-end.
+  end.
 
 isAlready(_, _, []) -> false;
-isAlready(Name, Surname, [#entry{name = Name, surname = Surname}|_]) -> true;
+isAlready(Name, Surname, [#entry{person = {Name, Surname}}|_]) -> true;
 isAlready(Name, Surname, [_|T]) -> isAlready(Name, Surname, T).
