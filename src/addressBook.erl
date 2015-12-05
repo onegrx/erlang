@@ -10,15 +10,15 @@
 -author("onegrx").
 
 %% API
--export([createAdressBook/0, addContact/3]).
+-export([createAddressBook/0, addContact/3]).
 
 -record(entry, {person, phone, email}).
 
-createAdressBook() -> [].
+createAddressBook() -> [].
 
-addContact(Name, Surname, AdressBook) ->
-  case isAlready(Name, Surname, AdressBook) of
-    false -> [#entry{person = {Name, Surname}}|AdressBook];
+addContact(Name, Surname, AddressBook) ->
+  case isAlready(Name, Surname, AddressBook) of
+    false -> [#entry{person = {Name, Surname}}|AddressBook];
     _ -> {error, "This entry already exists"}
   end.
 
