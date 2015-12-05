@@ -11,7 +11,6 @@
 
 %% API
 -export([createAddressBook/0, addContact/3, addEmail/4]).
-
 -record(entry, {person, phone, email}).
 
 createAddressBook() -> [].
@@ -22,16 +21,18 @@ addContact(Name, Surname, AddressBook) ->
     _ -> {error, "This person already exists"}
   end.
 
-isEmailAlready(_, []) -> false;
-isEmailAlready(Email, [#entry{email = Email}|_]) -> true;
-isEmailAlready(Email, [_|T]) -> isEmailAlready(Email, T).
-
 addEmail(Name, Surname, Email, AddressBook) ->
   case isEmailAlready(Email, AddressBook) of
     false -> actuallyAddEmail(Name, Surname, Email, AddressBook);
     _ -> {error, "This email already exists"}
   end.
 
+
+%% Functions which are not exposed to API
+
+isEmailAlready(_, []) -> false;
+isEmailAlready(Email, [#entry{email = Email}|_]) -> true;
+isEmailAlready(Email, [_|T]) -> isEmailAlready(Email, T).
 
 %% The address book is empty
 actuallyAddEmail(Name, Surname, Email, []) ->
