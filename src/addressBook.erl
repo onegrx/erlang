@@ -10,13 +10,14 @@
 -author("onegrx").
 
 %% API
--export([createAddressBook/0, addContact/3, addEmail/4]).
+-export([createAddressBook/0, addContact/3, addEmail/4, addPhone/4]).
+-export([removeContact/3]).
 -record(entry, {person, phone, email}).
 
 createAddressBook() -> [].
 
 addContact(Name, Surname, AddressBook) ->
-  case isAlready(Name, Surname, AddressBook) of
+  case isAlreadyPerson(Name, Surname, AddressBook) of
     false -> [#entry{person = {Name, Surname}}|AddressBook];
     _ -> {error, "This person already exists"}
   end.
@@ -27,12 +28,29 @@ addEmail(Name, Surname, Email, AddressBook) ->
     _ -> {error, "This email already exists"}
   end.
 
+addPhone(Name, Surname, Phone, AddressBook) ->
+  case isPhoneAlready(Phone, AddressBook) of
+    false -> actuallyAddPhone(Name, Surname, Phone, AddressBook);
+    _ -> {error, "This phone already exists"}
+  end.
+
+removeContact(Name, Surname, AddressBook) ->
+  case isAlreadyPerson(Name, Surname, AddressBook) of
+    true -> actuallyRemoveContact(Name, Surname, AddressBook);
+    _ -> {error, "The contact does't appear in the address book"}
+  end.
+
+
 
 %% Functions which are not exposed to API
 
 isEmailAlready(_, []) -> false;
 isEmailAlready(Email, [#entry{email = Email}|_]) -> true;
 isEmailAlready(Email, [_|T]) -> isEmailAlready(Email, T).
+
+isPhoneAlready(_, []) -> false;
+isPhoneAlready(Phone, [#entry{phone = Phone}|_]) -> true;
+isPhoneAlready(Phone, [_|T]) -> isPhoneAlready(Phone, T).
 
 %% The address book is empty
 actuallyAddEmail(Name, Surname, Email, []) ->
@@ -48,7 +66,19 @@ actuallyAddEmail(Name, Surname, Email, [#entry{person = {Name, Surname}}|T]) ->
 actuallyAddEmail(Name, Surname, Email, [H|T]) ->
   [H|actuallyAddEmail(Name, Surname, Email, T)].
 
+actuallyAddPhone(Name, Surname, Phone, []) ->
+  [#entry{person = {Name, Surname}, phone = Phone}];
+actuallyAddPhone(Name, Surname, Phone, [#entry{person = {Name, Surname}}|T]) ->
+  [#entry{person = {Name, Surname}, phone = Phone}|T];
+actuallyAddPhone(Name, Surname, Phone, [H|T]) ->
+  [H|actuallyAddEmail(Name, Surname, Phone, T)].
 
-isAlready(_, _, []) -> false;
-isAlready(Name, Surname, [#entry{person = {Name, Surname}}|_]) -> true;
-isAlready(Name, Surname, [_|T]) -> isAlready(Name, Surname, T).
+isAlreadyPerson(_, _, []) -> false;
+isAlreadyPerson(Name, Surname, [#entry{person = {Name, Surname}}|_]) -> true;
+isAlreadyPerson(Name, Surname, [_|T]) -> isAlreadyPerson(Name, Surname, T).
+
+actuallyRemoveContact(_, _, []) -> [];
+actuallyRemoveContact(Name, Surname, [#entry{person = {Name, Surname}}|T]) ->
+  T;
+actuallyRemoveContact(Name, Surname, [H|T]) ->
+  [H|actuallyRemoveContact(Name, Surname, T)].
