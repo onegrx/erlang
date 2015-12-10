@@ -11,7 +11,7 @@
 
 %% API
 -export([createAddressBook/0, addContact/3, addEmail/4, addPhone/4]).
--export([removeContact/3]).
+-export([removeContact/3, removeEmail/2]).
 -record(entry, {person, phone, email}).
 
 createAddressBook() -> [].
@@ -39,6 +39,13 @@ removeContact(Name, Surname, AddressBook) ->
     true -> actuallyRemoveContact(Name, Surname, AddressBook);
     _ -> {error, "The contact does't appear in the address book"}
   end.
+
+removeEmail(Email, AddressBook) ->
+  case isEmailAlready(Email, AddressBook) of
+    true -> actuallyRemoveEmail(Email, AddressBook);
+    _ -> {error, "The email doesn't appear in the address book"}
+  end.
+
 
 
 
@@ -82,3 +89,8 @@ actuallyRemoveContact(Name, Surname, [#entry{person = {Name, Surname}}|T]) ->
   T;
 actuallyRemoveContact(Name, Surname, [H|T]) ->
   [H|actuallyRemoveContact(Name, Surname, T)].
+
+actuallyRemoveEmail(_, []) -> [];
+actuallyRemoveEmail(Email, [#entry{email = Email, person = Person, phone = Phone}|T]) ->
+  [#entry{person = Person, phone = Phone}|T];
+actuallyRemoveEmail(Email, [H|T]) -> [H|actuallyRemoveEmail(Email, T)].
