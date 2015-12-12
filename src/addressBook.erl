@@ -10,9 +10,10 @@
 -author("onegrx").
 
 %% API
--export([createAddressBook/0, addContact/3, addEmail/4, addPhone/4]).
--export([removeContact/3, removeEmail/2]).
--record(entry, {person, phone, email}).
+%-export([createAddressBook/0, addContact/3, addEmail/4, addPhone/4]).
+%-export([removeContact/3, removeEmail/2]).
+-compile(export_all).
+-record(entry, {person, phone = [], email= []}).
 
 createAddressBook() -> [].
 
@@ -61,12 +62,12 @@ isPhoneAlready(Phone, [_|T]) -> isPhoneAlready(Phone, T).
 
 %% The address book is empty
 actuallyAddEmail(Name, Surname, Email, []) ->
-  [#entry{person = {Name, Surname}, email = Email}];
+  [#entry{person = {Name, Surname}, email = [Email]}];
 
 %% The person already exists and irregardless if he has email or does't it is
 %% entered or replaced
-actuallyAddEmail(Name, Surname, Email, [#entry{person = {Name, Surname}}|T]) ->
-  [#entry{person = {Name, Surname}, email = Email}|T];
+actuallyAddEmail(Name, Surname, Email, [#entry{person = {Name, Surname}, email = OldEmail}|T]) ->
+  [#entry{person = {Name, Surname}, email = [Email|OldEmail]}|T];
 
 %% Continue trying to find the person, in case of failure the tail finally is
 %% an empty list and new person is added
@@ -94,3 +95,21 @@ actuallyRemoveEmail(_, []) -> [];
 actuallyRemoveEmail(Email, [#entry{email = Email, person = Person, phone = Phone}|T]) ->
   [#entry{person = Person, phone = Phone}|T];
 actuallyRemoveEmail(Email, [H|T]) -> [H|actuallyRemoveEmail(Email, T)].
+
+
+% Checks if given Email is unique in whole AddressBook
+% Returns true if uniqueness is confirmed, otherwise false
+emailExists(Email, AddressBook) ->
+  lists:any(
+    fun(#entry{email = E}) -> lists:member(Email, E) end,
+    AddressBook
+  ).
+
+% Checks if given Phone is unique in whole AddressBook
+% Returns true if uniqueness is confirmed, otherwise false
+phoneExists(Phone, AddressBook) ->
+  lists:any(
+    fun(#entry{phone = P}) -> lists:member(Phone, P) end,
+    AddressBook
+  ).
+
