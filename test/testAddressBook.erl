@@ -51,4 +51,17 @@ remove_contact_test() ->
   ?assertNotEqual([], AB3),
   ?assertEqual([], AB4).
 
-
+remove_email_from_list_of_emails_test() ->
+  AB = addressBook:createAddressBook(),
+  AB1 = addressBook:addEmail("John", "Doe", "john@doe.com", AB),
+  AB2 = addressBook:addEmail("John", "Doe", "brandnewjohnmail@doe.com", AB1),
+  AB3 = addressBook:removeEmail("john@doe.com", AB2),
+  [{_, _, _, TwoEmailsList}|_] = AB2,
+  [{_, _, _, OneEmailList}|_] = AB3,
+  [TheOneEmail|_] = OneEmailList,
+  ?assertEqual(2, length(TwoEmailsList)),
+  ?assertEqual(1, length(OneEmailList)),
+  ?assertEqual("brandnewjohnmail@doe.com", TheOneEmail),
+  ?assert(lists:member("john@doe.com", TwoEmailsList)),
+  ?assertNot(lists:member("john@doe.com", OneEmailList)),
+  ?assert(lists:member("brandnewjohnmail@doe.com", OneEmailList)).
