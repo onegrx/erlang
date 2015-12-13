@@ -90,9 +90,8 @@ actuallyRemoveContact(Name, Surname, [H|T]) ->
   [H|actuallyRemoveContact(Name, Surname, T)].
 
 actuallyRemoveEmail(_, []) -> [];
-actuallyRemoveEmail(Email, [#entry{email = Email, person = Person, phone = Phone}|T]) ->
-  [#entry{person = Person, phone = Phone}|T];
-actuallyRemoveEmail(Email, [H|T]) -> [H|actuallyRemoveEmail(Email, T)].
+actuallyRemoveEmail(Email, [#entry{person = Person, phone = Phone, email = List}|T]) ->
+  [#entry{person = Person, phone = Phone, email = [E || E <- List, E /= Email]}|T].
 
 
 % Checks if given Email is unique in whole AddressBook
