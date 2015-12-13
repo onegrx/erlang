@@ -24,15 +24,15 @@ addContact(Name, Surname, AddressBook) ->
   end.
 
 addEmail(Name, Surname, Email, AddressBook) ->
-  case isEmailAlready(Email, AddressBook) of
-    false -> actuallyAddEmail(Name, Surname, Email, AddressBook);
-    _ -> {error, "This email already exists"}
+  case emailExists(Email, AddressBook) of
+    true -> {error, "This email already exists"};
+    false -> actuallyAddEmail(Name, Surname, Email, AddressBook)
   end.
 
 addPhone(Name, Surname, Phone, AddressBook) ->
-  case isPhoneAlready(Phone, AddressBook) of
-    false -> actuallyAddPhone(Name, Surname, Phone, AddressBook);
-    _ -> {error, "This phone already exists"}
+  case phoneExists(Phone, AddressBook) of
+    true -> {error, "This phone already exists"};
+    false -> actuallyAddPhone(Name, Surname, Phone, AddressBook)
   end.
 
 removeContact(Name, Surname, AddressBook) ->
@@ -42,23 +42,17 @@ removeContact(Name, Surname, AddressBook) ->
   end.
 
 removeEmail(Email, AddressBook) ->
-  case isEmailAlready(Email, AddressBook) of
+  case emailExists(Email, AddressBook) of
     true -> actuallyRemoveEmail(Email, AddressBook);
-    _ -> {error, "The email doesn't appear in the address book"}
+    false -> {error, "The email doesn't appear in the address book"}
   end.
 
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Functions which are not exposed to API %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% Functions which are not exposed to API
-
-isEmailAlready(_, []) -> false;
-isEmailAlready(Email, [#entry{email = Email}|_]) -> true;
-isEmailAlready(Email, [_|T]) -> isEmailAlready(Email, T).
-
-isPhoneAlready(_, []) -> false;
-isPhoneAlready(Phone, [#entry{phone = Phone}|_]) -> true;
-isPhoneAlready(Phone, [_|T]) -> isPhoneAlready(Phone, T).
 
 %% The address book is empty
 actuallyAddEmail(Name, Surname, Email, []) ->
@@ -66,8 +60,9 @@ actuallyAddEmail(Name, Surname, Email, []) ->
 
 %% The person already exists and irregardless if he has email or does't it is
 %% entered or replaced
-actuallyAddEmail(Name, Surname, Email, [#entry{person = {Name, Surname}, email = OldEmail}|T]) ->
-  [#entry{person = {Name, Surname}, email = [Email|OldEmail]}|T];
+actuallyAddEmail(Name, Surname, Email,
+    [#entry{person = {Name, Surname}, phone = P, email = OldEmail}|T]) ->
+  [#entry{person = {Name, Surname}, phone = P, email = [Email|OldEmail]}|T];
 
 %% Continue trying to find the person, in case of failure the tail finally is
 %% an empty list and new person is added
@@ -75,9 +70,12 @@ actuallyAddEmail(Name, Surname, Email, [H|T]) ->
   [H|actuallyAddEmail(Name, Surname, Email, T)].
 
 actuallyAddPhone(Name, Surname, Phone, []) ->
-  [#entry{person = {Name, Surname}, phone = Phone}];
-actuallyAddPhone(Name, Surname, Phone, [#entry{person = {Name, Surname}}|T]) ->
-  [#entry{person = {Name, Surname}, phone = Phone}|T];
+  [#entry{person = {Name, Surname}, phone = [Phone]}];
+
+actuallyAddPhone(Name, Surname, Phone,
+    [#entry{person = {Name, Surname}, phone = OldPhone, email = E}|T]) ->
+  [#entry{person = {Name, Surname}, phone = [Phone|OldPhone], email = E}|T];
+
 actuallyAddPhone(Name, Surname, Phone, [H|T]) ->
   [H|actuallyAddEmail(Name, Surname, Phone, T)].
 
