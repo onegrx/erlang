@@ -31,3 +31,24 @@ add_email_for_existing_person_test() ->
   [H|_] = AB2,
   {_, _, _, Email} = H,
   ?assertEqual(["will@smith.com"], Email).
+
+add_email_for_nonexistent_person_test() ->
+  AB = addressBook:createAddressBook(),
+  AB1 = addressBook:addEmail("Will", "Smith", "will@smith.com", AB),
+  [H|_] = AB1,
+  {_, Person, _, Email} = H,
+  ?assertEqual({"Will", "Smith"}, Person),
+  ?assertEqual(["will@smith.com"], Email).
+
+remove_contact_test() ->
+  AB = addressBook:createAddressBook(),
+  AB1 = addressBook:addEmail("John", "Doe", "john@doe.com", AB),
+  AB2 = addressBook:addContact("Will", "Smith", AB1),
+  AB3 = addressBook:removeContact("Will", "Smith", AB2),
+  [_|EmptyTail] = AB3,
+  AB4 = addressBook:removeContact("John", "Doe", AB3),
+  ?assertEqual([], EmptyTail),
+  ?assertNotEqual([], AB3),
+  ?assertEqual([], AB4).
+
+
