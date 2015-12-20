@@ -11,14 +11,31 @@
 
 %% API
 -export([start/0, stop/0, play/1]).
+-export([loop/0]).
 
 start() ->
-  register(ping, spawn(?MODULE, function, [])),
-  register(pong, spawn(?MODULE, function, [])).
+  Ping = spawn(?MODULE, loop, []),
+  Pong = spawn(?MODULE, loop, []),
+  register(ping, Ping),
+  register(pong, Pong).
 
 stop() ->
   ping ! stop,
   pong ! stop.
 
 play(N) ->
-  ping ! N.
+  ping ! {pong, N}.
+
+loop() ->
+  receive
+
+    {_, 0} -> stop();
+    {Pid, N} ->
+      timer:sleep(500),
+      {_, Name} = process_info(self(), registered_name),
+      io:format("In \"~s\". To send: ~p~n", [Name, N]),
+      Pid ! {self(), N - 1},
+      loop()
+  after 20000 -> ok
+  end.
+
